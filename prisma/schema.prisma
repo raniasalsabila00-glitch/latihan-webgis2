@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model bangunan_gedung {
+  id     Int     @id @default(autoincrement())
+  nama   String?
+  alamat String?
+  luas   Float?
+}
+
+model katalog_data_2d {
+  data_2d_id  String   @id(map: "katalog_data_pk") @db.VarChar(50)
+  layer_name  String?  @db.VarChar(50)
+  akses       String?  @db.VarChar(50)
+  is_editable Boolean?
+  wms_url     String?  @db.VarChar(64)
+  wfs_url     String?  @db.VarChar(256)
+  author      String?  @db.VarChar(50)
+  users       users?   @relation(fields: [author], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "katalog_data_2d_users_fk")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model spatial_ref_sys {
+  srid      Int     @id
+  auth_name String? @db.VarChar(256)
+  auth_srid Int?
+  srtext    String? @db.VarChar(2048)
+  proj4text String? @db.VarChar(2048)
+}
+
+model users {
+  user_id         String            @id(map: "users_pk") @db.VarChar
+  email           String            @unique(map: "users_unique") @db.VarChar
+  password        String?           @db.VarChar
+  is_active       Boolean?
+  role            String?           @db.VarChar
+  nama            String?           @db.VarChar
+  katalog_data_2d katalog_data_2d[]
+}
